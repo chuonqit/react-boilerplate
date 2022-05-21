@@ -1,24 +1,16 @@
 import { useState } from "react";
 import Photo360 from "./components/Photo360";
 
+import "./App.css";
+
 function App() {
   const [image, setImage] = useState<string>("https://i.imgur.com/s7gBWif.jpg");
 
   return (
-    <div
-      className="App"
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 16,
-        flexDirection: "column",
-        padding: 16,
-      }}
-    >
-      <Photo360 src={image} />
+    <div className="App">
+      {image && <Photo360 src={image} />}
       <input
-        type="text"
+        type="search"
         value={image}
         onChange={(e) => setImage(e.target.value)}
         style={{ width: 500 }}
