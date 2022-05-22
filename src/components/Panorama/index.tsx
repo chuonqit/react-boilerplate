@@ -1,13 +1,8 @@
 import * as THREE from "three";
 import { useState, Suspense, useEffect, WheelEvent } from "react";
-import { Canvas, useThree, useLoader, useFrame } from "@react-three/fiber";
+import { Canvas, useThree, useLoader, useFrame, Euler } from "@react-three/fiber";
 import { Html, OrbitControls, Loader, useProgress } from "@react-three/drei";
-import {
-  AiOutlineFullscreen,
-  AiOutlineFullscreenExit,
-  AiOutlinePlus,
-  AiOutlineMinus,
-} from "react-icons/ai";
+import { AiOutlineExpand, AiOutlineCompress, AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 
 import "./Panorama.css";
 
@@ -84,15 +79,15 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
       }}
     >
       <Canvas
-        camera={{ position: [0, 0, 2.75], fov: fov }}
         flat={true}
         linear={true}
         onWheel={onMouseWheel}
+        camera={{ position: [0, 0, 2.75], fov: fov }}
       >
         <Suspense
           fallback={
             <Html>
-              <Loader />
+              <Loader initialState={() => true} />
             </Html>
           }
         >
@@ -100,7 +95,7 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
             enableDamping
             enableZoom={false}
             enablePan={false}
-            dampingFactor={0.05}
+            dampingFactor={0.03}
             rotateSpeed={-0.3}
           />
           <Environment />
@@ -112,30 +107,32 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
             <div className="panorama-control--wrapper">
               <button className="panorama-control--btn" onClick={handleFullScreen}>
                 {isFullScreen ? (
-                  <AiOutlineFullscreenExit className="panorama-control--btn__icon" />
+                  <AiOutlineCompress className="panorama-control--btn__icon" />
                 ) : (
-                  <AiOutlineFullscreen className="panorama-control--btn__icon" />
+                  <AiOutlineExpand className="panorama-control--btn__icon" />
                 )}
               </button>
-              <div className="panorama-control--btn__group">
-                <button
-                  className="panorama-control--btn"
-                  onClick={() => setFov(fov <= 10 ? 10 : fov - 7)}
-                  disabled={fov <= 10}
-                >
-                  <AiOutlinePlus style={{ fontSize: "16px" }} />
-                </button>
-                <button
-                  className="panorama-control--btn"
-                  onClick={() => setFov(fov >= 80 ? 80 : fov + 7)}
-                  disabled={fov >= 80}
-                >
-                  <AiOutlineMinus style={{ fontSize: "16px" }} />
-                </button>
-              </div>
+              <button
+                className="panorama-control--btn"
+                onClick={() => setFov(fov <= 10 ? 10 : fov - 7)}
+                disabled={fov <= 10}
+              >
+                <AiOutlinePlus className="panorama-control--btn__icon" />
+              </button>
+              <button
+                className="panorama-control--btn"
+                onClick={() => setFov(fov >= 80 ? 80 : fov + 7)}
+                disabled={fov >= 80}
+              >
+                <AiOutlineMinus className="panorama-control--btn__icon" />
+              </button>
             </div>
           </div>
-          <div className="panorama-scan" style={{ transform: `rotate(${rotation}rad)` }}></div>
+          <div className="panorama-radar" style={{ transform: `rotate(${rotation}rad)` }}>
+            <i></i>
+            <i></i>
+          </div>
+          {/* <div className="panorama-scan" style={{ transform: `rotate(${rotation}rad)` }}></div> */}
         </>
       )}
     </div>
