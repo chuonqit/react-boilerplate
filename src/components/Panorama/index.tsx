@@ -1,7 +1,7 @@
-import React, { useState, Suspense, useEffect } from "react";
 import * as THREE from "three";
+import { useState, Suspense, useEffect, WheelEvent } from "react";
 import { Canvas, useThree, useLoader, useFrame } from "@react-three/fiber";
-import { Html, Loader, OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls, Loader, useProgress } from "@react-three/drei";
 import {
   AiOutlineFullscreen,
   AiOutlineFullscreenExit,
@@ -19,7 +19,11 @@ type Props = {
 
 const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
   const [fov, setFov] = useState<number>(80);
+  const [rotation, setRotation] = useState<number>(0);
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+  const progressActive = useProgress((state) => {
+    return state.progress;
+  });
 
   const exitFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -40,7 +44,16 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = texture;
 
+    const vector = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    const spherical = new THREE.Spherical();
+
     useFrame((state: any) => {
+      vector.copy(state.camera.position).sub(center);
+      spherical.setFromVector3(vector);
+      const sphericalRotation = spherical.theta;
+      setRotation(sphericalRotation);
+
       state.camera.fov = fov;
       state.camera.updateProjectionMatrix();
     });
@@ -48,7 +61,7 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
     return null;
   };
 
-  const onMouseWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+  const onMouseWheel = (e: WheelEvent<HTMLDivElement>) => {
     const fovVal = Math.sign(e.deltaY) * 0.05 + fov + e.deltaY * 0.3;
     setFov(THREE.MathUtils.clamp(fovVal, 10, 80));
   };
@@ -64,10 +77,11 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
 
   return (
     <div
-      className={
-        isFullScreen ? "panorama-wrapper fullscreen" : "panorama-wrapper"
-      }
-      style={{ width: width, height: height }}
+      className={isFullScreen ? "panorama-wrapper fullscreen" : "panorama-wrapper"}
+      style={{
+        width: width,
+        height: height,
+      }}
     >
       <Canvas
         camera={{ position: [0, 0, 2.75], fov: fov }}
@@ -92,33 +106,38 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
           <Environment />
         </Suspense>
       </Canvas>
-      <div className="panorama-control">
-        <div className="panorama-control--wrapper">
-          <button className="panorama-control--btn" onClick={handleFullScreen}>
-            {isFullScreen ? (
-              <AiOutlineFullscreenExit className="panorama-control--btn__icon" />
-            ) : (
-              <AiOutlineFullscreen className="panorama-control--btn__icon" />
-            )}
-          </button>
-          <div className="panorama-control--btn__group">
-            <button
-              className="panorama-control--btn"
-              onClick={() => setFov(fov <= 10 ? 10 : fov - 5)}
-              disabled={fov <= 10}
-            >
-              <AiOutlinePlus style={{ fontSize: "16px" }} />
-            </button>
-            <button
-              className="panorama-control--btn"
-              onClick={() => setFov(fov >= 80 ? 80 : fov + 5)}
-              disabled={fov >= 80}
-            >
-              <AiOutlineMinus style={{ fontSize: "16px" }} />
-            </button>
+      {progressActive === 100 && (
+        <>
+          <div className="panorama-control">
+            <div className="panorama-control--wrapper">
+              <button className="panorama-control--btn" onClick={handleFullScreen}>
+                {isFullScreen ? (
+                  <AiOutlineFullscreenExit className="panorama-control--btn__icon" />
+                ) : (
+                  <AiOutlineFullscreen className="panorama-control--btn__icon" />
+                )}
+              </button>
+              <div className="panorama-control--btn__group">
+                <button
+                  className="panorama-control--btn"
+                  onClick={() => setFov(fov <= 10 ? 10 : fov - 7)}
+                  disabled={fov <= 10}
+                >
+                  <AiOutlinePlus style={{ fontSize: "16px" }} />
+                </button>
+                <button
+                  className="panorama-control--btn"
+                  onClick={() => setFov(fov >= 80 ? 80 : fov + 7)}
+                  disabled={fov >= 80}
+                >
+                  <AiOutlineMinus style={{ fontSize: "16px" }} />
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+          <div className="panorama-scan" style={{ transform: `rotate(${rotation}rad)` }}></div>
+        </>
+      )}
     </div>
   );
 };
