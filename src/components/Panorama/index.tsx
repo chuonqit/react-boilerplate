@@ -21,8 +21,8 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
   const [fov, setFov] = useState<number>(80);
   const [rotation, setRotation] = useState<number>(0);
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
-  const progressActive = useProgress((state) => {
-    return state.progress;
+  const [progressActive, errors] = useProgress((state) => {
+    return [state.progress, state.errors];
   });
 
   const exitFullScreen = () => {
@@ -75,7 +75,7 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
     }
   };
 
-  return (
+  return !errors.includes(src) ? (
     <div
       className={isFullScreen ? "panorama-wrapper fullscreen" : "panorama-wrapper"}
       style={{
@@ -139,7 +139,7 @@ const Panorama = ({ src, width = "600px", height = "300px" }: Props) => {
         </>
       )}
     </div>
-  );
+  ) : null;
 };
 
 export default Panorama;
