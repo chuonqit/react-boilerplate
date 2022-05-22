@@ -1,0 +1,73 @@
+.panorama-wrapper {
+  position: relative;
+  background-color: #ebebeb;
+}
+
+.panorama-wrapper.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999;
+}
+
+.panorama-control {
+  top: 0;
+  left: 0;
+  position: absolute;
+  padding: 5px;
+}
+
+.panorama-wrapper.fullscreen .panorama-control--wrapper {
+  padding-top: 10px;
+}
+
+.panorama-control--wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 5px;
+}
+
+.panorama-wrapper.fullscreen .panorama-control--btn {
+  margin-left: 10px;
+}
+
+.panorama-control--btn {
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #999;
+  border-color: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.panorama-control--btn:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+
+.panorama-control--btn__icon {
+  font-size: 20px;
+}
+
+.panorama-control--btn__group {
+  margin-top: 5px;
+}
+
+.panorama-control--btn__group .panorama-control--btn {
+  margin-bottom: -1px;
+  border-radius: 0;
+}
+.panorama-control--btn__group .panorama-control--btn:first-of-type {
+  border-radius: 3px 3px 0 0;
+}
+.panorama-control--btn__group .panorama-control--btn:last-of-type {
+  border-radius: 0 0 3px 3px;
+}
